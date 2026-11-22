@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { ContactService } from '../../../core/services/contact.service';
 import { Contact } from '../../../core/models/contact.model';
 
@@ -15,28 +16,29 @@ import { Contact } from '../../../core/models/contact.model';
           <th>ID</th>
           <th>Name</th>
           <th>Phone</th>
+          <th>Address</th>
           <th>Email</th>
-          <th>Timezone</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let c of contacts">
+        <tr *ngFor="let c of contacts" class="row" (click)="open(c)">
           <td>{{ c.id }}</td>
           <td>{{ c.name }}</td>
           <td>{{ c.phone_number }}</td>
+          <td>{{ c.address || '—' }}</td>
           <td>{{ c.email || '—' }}</td>
-          <td>{{ c.timezone }}</td>
-          <td><button (click)="remove(c.id)">Delete</button></td>
+          <td><button (click)="remove(c); $event.stopPropagation()">Delete</button></td>
         </tr>
       </tbody>
     </table>
   `,
+  styles: [`.row { cursor: pointer; }`],
 })
 export class ContactListComponent implements OnInit {
   contacts: Contact[] = [];
 
-  constructor(private contactService: ContactService) {}
+  constructor(private contactService: ContactService, private router: Router) {}
 
   ngOnInit(): void {
     this.load();
@@ -46,7 +48,15 @@ export class ContactListComponent implements OnInit {
     this.contactService.list().subscribe((data) => (this.contacts = data));
   }
 
-  remove(id: number): void {
-    this.contactService.delete(id).subscribe(() => this.load());
+  open(c: Contact): void {
+    this.router.navigate(['/bank/villagers', c.id]);
+  }
+
+  remove(c: Contact): void {
+    if (!confirm(`Delete ${c.name}?`)) return;
+    this.contactService.delete(c.id).subscribe({
+      next: () => this.load(),
+      error: (e) => alert(e?.error?.detail || 'Could not delete this villager.'),
+    });
   }
 }

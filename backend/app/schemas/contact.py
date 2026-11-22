@@ -8,6 +8,7 @@ class ContactBase(BaseModel):
     name: str
     phone_number: str
     email: Optional[str] = None
+    address: Optional[str] = None
     timezone: Optional[str] = "UTC"
 
 
@@ -19,6 +20,7 @@ class ContactUpdate(BaseModel):
     name: Optional[str] = None
     phone_number: Optional[str] = None
     email: Optional[str] = None
+    address: Optional[str] = None
     timezone: Optional[str] = None
 
 

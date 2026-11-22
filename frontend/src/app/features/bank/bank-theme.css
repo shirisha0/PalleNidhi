@@ -1,0 +1,105 @@
+.bank {
+  --bank-bg: #FAF8F3;
+  --bank-surface: #FFFFFF;
+  --bank-ink: #1F2933;
+  --bank-ink-muted: #6B7280;
+  --bank-border: #E5E1D8;
+  --bank-money-in: #1E7A4C;
+  --bank-money-in-bg: #EAF6EF;
+  --bank-money-out: #B3261E;
+  --bank-money-out-bg: #FBEAE9;
+  --bank-amber: #9A6B14;
+  --bank-amber-bg: #FBF3E1;
+
+  background: var(--bank-bg);
+  color: var(--bank-ink);
+  font-family: 'Inter', -apple-system, sans-serif;
+  padding: 28px 32px 60px;
+}
+
+.bank h1, .bank h2, .bank h3 {
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  color: var(--bank-ink);
+  margin: 0;
+}
+
+.bank .card {
+  background: var(--bank-surface);
+  border: 1px solid var(--bank-border);
+  border-radius: 10px;
+}
+
+.bank table { width: 100%; border-collapse: collapse; }
+.bank th {
+  text-align: left;
+  font-size: 0.78rem;
+  color: var(--bank-ink-muted);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--bank-border);
+}
+.bank td {
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--bank-border);
+  font-size: 0.94rem;
+}
+
+.bank input, .bank select, .bank textarea {
+  background: var(--bank-surface);
+  border: 1px solid var(--bank-border);
+  color: var(--bank-ink);
+  padding: 9px 11px;
+  border-radius: 7px;
+  font-size: 0.94rem;
+  width: 100%;
+}
+.bank label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.82rem;
+  color: var(--bank-ink-muted);
+  margin-bottom: 14px;
+}
+
+.bank button.primary {
+  background: var(--bank-ink);
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 7px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.bank button.primary:disabled { opacity: 0.4; cursor: default; }
+.bank button.ghost {
+  background: transparent;
+  border: 1px solid var(--bank-border);
+  padding: 9px 16px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+.bank button.danger {
+  background: var(--bank-money-out-bg);
+  color: var(--bank-money-out);
+  border: 1px solid var(--bank-money-out);
+  padding: 8px 14px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.bank .badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.badge.status-requested, .badge.status-pending { background: var(--bank-amber-bg); color: var(--bank-amber); }
+.badge.status-approved, .badge.status-active, .badge.status-confirmed { background: var(--bank-money-in-bg); color: var(--bank-money-in); }
+.badge.status-overdue, .badge.status-failed, .badge.status-rejected { background: var(--bank-money-out-bg); color: var(--bank-money-out); }
+.badge.status-repaid, .badge.status-completed { background: #EEF0F2; color: var(--bank-ink-muted); }
+.badge.status-rescheduled { background: #EAF0FB; color: #2452A6; }
+
+.bank .money-in { color: var(--bank-money-in); font-weight: 600; }
+.bank .money-out { color: var(--bank-money-out); font-weight: 600; }

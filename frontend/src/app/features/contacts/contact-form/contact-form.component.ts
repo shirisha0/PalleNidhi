@@ -20,6 +20,11 @@ import { ContactService } from '../../../core/services/contact.service';
       </label>
 
       <label>
+        Address
+        <input type="text" formControlName="address" placeholder="House no., village" />
+      </label>
+
+      <label>
         Email (optional)
         <input type="email" formControlName="email" />
       </label>
@@ -48,6 +53,7 @@ export class ContactFormComponent {
     this.form = this.fb.group({
       name: ['', Validators.required],
       phone_number: ['', Validators.required],
+      address: [''],
       email: [''],
       timezone: ['UTC'],
     });

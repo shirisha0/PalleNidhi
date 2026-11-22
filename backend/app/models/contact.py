@@ -11,6 +11,7 @@ class Contact(Base):
     name = Column(String(255), nullable=False)
     phone_number = Column(String(20), nullable=False, index=True)
     email = Column(String(255), nullable=True)
+    address = Column(String(255), nullable=True)
     timezone = Column(String(64), default="UTC")
     created_at = Column(DateTime, server_default=func.now())
 
