@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from datetime import datetime
 
@@ -9,13 +8,14 @@ from app.config import settings
 from app.database import SessionLocal
 from app.models.reminder import Reminder, ReminderStatus
 from app.services.genai_service import generate_call_prompt
+from app.services.loan_reminders import run_loan_reminder_scan
 from app.services.voice_api_service import place_outbound_call
 
 logger = logging.getLogger("reminder_scheduler")
 
 
 async def process_due_reminders():
-    """Poll the DB for reminders due now, generate a prompt, and place calls."""
+    """Poll the DB for reminders due now, then place the calls."""
     db: Session = SessionLocal()
     try:
         due_reminders = (
@@ -30,7 +30,11 @@ async def process_due_reminders():
         for reminder in due_reminders:
             try:
                 contact = reminder.contact
-                prompt = await generate_call_prompt(reminder, contact.name)
+                # Loan reminders arrive with an exact, pre-built script (amounts must
+                # never pass through an LLM). Everything else is generated as before.
+                prompt = reminder.generated_prompt or await generate_call_prompt(
+                    reminder, contact.name
+                )
                 reminder.generated_prompt = prompt
                 reminder.status = ReminderStatus.calling
                 db.commit()
@@ -49,13 +53,32 @@ async def process_due_reminders():
         db.close()
 
 
+async def loan_reminder_job():
+    """Hourly: queue calls for loans that are due soon, due today, or overdue."""
+    db: Session = SessionLocal()
+    try:
+        result = run_loan_reminder_scan(db)
+        if result.get("created"):
+            print(f"🏦 LOAN SCAN: queued reminders {result['reminder_ids']}")
+    except Exception as exc:
+        logger.error(f"Loan reminder scan failed: {exc}")
+    finally:
+        db.close()
+
+
 def start_scheduler() -> AsyncIOScheduler:
     scheduler = AsyncIOScheduler()
     scheduler.add_job(
-    process_due_reminders,
+        process_due_reminders,
         "interval",
         seconds=settings.SCHEDULER_POLL_INTERVAL_SECONDS,
         id="due_reminders_poll",
+    )
+    scheduler.add_job(
+        loan_reminder_job,
+        "interval",
+        minutes=60,
+        id="loan_reminder_scan",
     )
     scheduler.start()
     logger.info("Reminder scheduler started")

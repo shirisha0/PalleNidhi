@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.contact import Contact
+from app.models.loan import Loan
+from app.models.transaction import Transaction
 from app.schemas.contact import ContactCreate, ContactUpdate, ContactOut
 
 router = APIRouter(prefix="/contacts", tags=["Contacts"])
@@ -49,5 +51,17 @@ def delete_contact(contact_id: int, db: Session = Depends(get_db)):
     contact = db.query(Contact).filter(Contact.id == contact_id).first()
     if not contact:
         raise HTTPException(status_code=404, detail="Contact not found")
+
+    # A villager with money records can never be removed: the ledger is a
+    # permanent audit trail.
+    has_loan = db.query(Loan).filter(Loan.contact_id == contact_id).first()
+    has_transaction = db.query(Transaction).filter(Transaction.contact_id == contact_id).first()
+    if has_loan or has_transaction:
+        raise HTTPException(
+            status_code=409,
+            detail="This villager has loans or transactions, so they cannot be deleted. "
+                   "The ledger keeps these records permanently.",
+        )
+
     db.delete(contact)
     db.commit()

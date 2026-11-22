@@ -20,10 +20,11 @@ class Reminder(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     contact_id = Column(Integer, ForeignKey("contacts.id"), nullable=False)
+    loan_id = Column(Integer, ForeignKey("loans.id"), nullable=True, index=True)  # set for loan reminders
     context = Column(Text, nullable=False)  # raw task/reminder description
     scheduled_time = Column(DateTime, nullable=False, index=True)
     status = Column(Enum(ReminderStatus), default=ReminderStatus.pending, index=True)
-    generated_prompt = Column(Text, nullable=True)  # GenAI-generated call prompt
+    generated_prompt = Column(Text, nullable=True)  # the script spoken on the call
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
